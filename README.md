@@ -1,0 +1,2 @@
+TO USE:
+1. In fetchRelCoordinates in transfer_data.py, set the correct directory to the opened txt file that is used to relay the target location. For example, in the test case this file was updated from game simulation environment. In any case, the file should always only contain one row where the coordinates in the user's coordinate frame is given as "X,Y", so for example "50,100". The user's coordinate frame is set up so that the user is always at 0,0 and is looking towards positive Y-axis.
