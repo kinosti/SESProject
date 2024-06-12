@@ -34,9 +34,6 @@ def t1():
     # ---- Set connection to BiMatrix and initialize base settings
     bm.initializeController()
 
-    # ---- Set initial data (e.g., user settings or certain easy-to-change universal values for faster testing n development)
-    # tässä? p2d?
-
     # ---- Initialize Gaussian Normal Distribution lookup-table with the initial data limits
     GaussianLookup = p2d.calcGaussianCoeffLookupTable()
 
@@ -72,10 +69,6 @@ def t1():
         if now-prevTime > sleepTime:
             prevTime = now
             # ---- Fetch ping location (ping is updated separately with independent refresh rate, so the ping might or might not be updated from previous loop)
-            #ping = td.fetchRelCoordinates(fromFile=True)
-            #x, y = pingData
-            #pingData = (x*10,y*10)
-            #print("PING COORDINATES: ", pingData)
             
             if pingData != (0,0):
                 if trialStartTime == 0:
@@ -130,20 +123,6 @@ def t2():
 
     sleepTime = 0.005
 
-    """
-    prevTime = time.perf_counter()
-    while True:
-        if exitRequested:
-            #return
-            raise SystemExit()
-
-        now = time.perf_counter()
-        if now-prevTime > sleepTime:
-            prevTime = now
-            x, y = td.fetchRelCoordinates(fromFile=False) 
-            #pingData = (x*10,y*10)
-            pingData = (x,y)
-    """
     while True:
         if exitRequested:
             #return
@@ -153,9 +132,6 @@ def t2():
         if P_USELOCPULSE:
             goalBehind=True if y<0 else False
         pingData = (x*10,y*10)
-
-        #x, y = td.fetchRelCoordinates(fromFile=False) 
-        #pingData = (x,y)
 
         time.sleep(sleepTime)
 
@@ -189,28 +165,3 @@ if __name__ == '__main__':
             print("All threads are closed - exiting")
             print("-------------------------")
             raise SystemExit()
-
-    """
-    # ---- Set connection to BiMatrix and initialize base settings
-    bm.initializeController()
-
-    # ---- Set initial data (e.g., user settings or certain easy-to-change universal values for faster testing n development)
-    # tässä? p2d?
-
-    # ---- Initialize Gaussian Normal Distribution lookup-table with the initial data limits
-    GaussianLookup = p2d.calcGaussianCoeffLookupTable()
-
-    # ---- Loop until exit:
-    prevTriggerTime = 0
-    while True: 
-
-        # ---- Fetch ping location (ping is updated separately with independent refresh rate, so the ping might or might not be updated from previous loop)
-        ping = td.fetchRelCoordinates(fromFile=True)
-        print("PING COORDINATES: ", ping)
-        
-        # ---- Calculate pulse sequence data from ping location (that has been transformed based on user orientation)
-        data = p2d.getPulseSequenceData(ping, GaussianLookup)
-
-        # ---- Generate the pulse sequence
-        prevTriggerTime = bm.executePulseSequence(data, prevTriggerTime)
-    """
