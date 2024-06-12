@@ -34,7 +34,8 @@ def fetchRelCoordinates(fromFile=False):
     if fromFile:
         coordinates_str = ''
         while len(coordinates_str) < 3:
-            with open('D:/OneDrive - Aalto University/Kurssimateriaalit/Kevät 2023/Individual Assignment - Surface Electrode Stimulation/SES project/Godot/relativeCoordinates.txt', 'r') as file:
+            # TO USE: set below the path to the txt file that has the coordinates. The file should only consist of a single line which has the X,Y coordinates separated by a single comma, eg: "50,100" for a target that is infront of the user slightly (22.5deg) to the right. Note: the user is always at location 0,0 faces always to 0-angle, and the angle is given in range of -180...180, where CW direction is positive. Whatever method the target location is gathered with, the program should always update this file to include the most up-to-date location of the target in the user's coordinate frame. 
+            with open('COORDINATE/FILE/ADDRESS/HERE.txt', 'r') as file:
                 coordinates_str = file.read()
                 if len(coordinates_str) < 3:
                     break
