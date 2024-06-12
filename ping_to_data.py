@@ -29,28 +29,13 @@ def EuclideanDistance(p1,p2):
 
 
 def locationToElectrodes(location):
-    # NOTE: nyt tälläisenä puoliturhana funkkina, koska ajatuksena myöhemmin se että tätä kautta voi helpommin vaihdella erilaisia mappauksia,
-        # joka tosin nyt ei oleellinen kun rigid anodikatodit ja vain 3x3 käyttö
-
     # from sensed stimulation locations to associated anodes/cathodes
 
     if P_SIZE == 8: 
         # New array of 16 electrodes arranged in pairs of 2 (as 2 rows of 8 electrodes). 
         # Pin 4 is the first pin in use as first 3 are not connected to used electrodes.
         # The electrodes are mapped in order always from left to right but for the first half the electode pairs are ordered bottom-top but then order changes to top-bottom
-        """
-        anodesCathodes = {
-        0: ([10],[12]), # ([13],[11]), neither one is "proper" as the electoreds here are aligned diagonally # NOTE: is the localization pulse
-        1: ([4],[5]), # bottom-top (the left-most electrode pair if device is correct-face-up and port&electrode pad is facing away)
-        2: ([6],[7]), # bottom-top
-        3: ([8],[9]), # bottom-top
-        4: ([10],[11]), # bottom-top
-        5: ([13],[12]), # top-bottom (order swith at the midpoint of the array)
-        6: ([15],[14]), # top-bottom
-        7: ([17],[16]), # top-bottom
-        8: ([19],[18]) # top-bottom (the right-most electrode pair if device is correct-face-up and port&electrode pad is facing away)
-        }
-        """
+
         anodesCathodes = {
         0: ([10],[12]), # ([13],[11]), neither one is "proper" as the electrodes here are aligned diagonally # NOTE: is the localization pulse
         1: ([18],[19]), # top-bottom (the right-most electrode pair if device is correct-face-up and port&electrode pad is facing away)
@@ -62,34 +47,7 @@ def locationToElectrodes(location):
         7: ([6],[7]), # bottom-top
         8: ([4],[5]) # bottom-top (the left-most electrode pair if device is correct-face-up and port&electrode pad is facing away)
         }
-    # Alla lisätty +2 indekseihin, sillä electrodipädeissä ensimmäiset 2 (ja viimeiset 2) elektrodipinnniä ei käytössä, vaan ensimmäinen elektrodi on pinnissä 3
-    # if P_SIZE == 9:
-    #     anodesCathodes = {
-    #         0: ([8],[10]), # NOTE: is the localization pulse
-    #         1: ([7],[3]), # ~=(5,1), mutta +2
-    #         2: ([7],[10]),
-    #         3: ([7],[11]),
-    #         4: ([7],[4]),
-    #         5: ([8],[10]),
-    #         6: ([7],[14]),
-    #         7: ([7],[5]),
-    #         8: ([7],[8]),
-    #         9: ([7],[13])
-    #     }
-
-    # if P_SIZE == 9:
-    #     anodesCathodes = {
-    #         0: ([7],[8]), # NOTE: is the localization pulse
-    #         1: ([3],[4]), # ~=(1,2), mutta +2
-    #         2: ([10],[7]),
-    #         3: ([11],[14]),
-    #         4: ([4],[5]),
-    #         5: ([7],[8]),
-    #         6: ([14],[13]),
-    #         7: ([5],[6]),
-    #         8: ([8],[9]),
-    #         9: ([13],[12])
-    #     }
+   
     elif P_SIZE == 7: 
         anodesCathodes = {
         0: ([10],[12]), # ([13],[11]), neither one is "proper" as the electrodes here are aligned diagonally # NOTE: is the localization pulse
@@ -253,29 +211,6 @@ def calcGaussianCoeffLookupTable():
     # Calculates a gaussian-distribution lookup table (as sp.stats.norm.sf is too slow to do it "online")
 
     coeffLookupTable = {}
-    """
-
-    #zScore = (x-mu)/sigma
-    for integer in range(0,10000):
-        for decimals in range(0,100): 
-            x = float(str(integer) + "." + str(decimals))
-
-
-            # TODO check zScore x/100 etc logic
-            #zScore = x/100
-            mu = 0
-            sigma = GAUSS_STDDEV
-            zScore = round((x-mu)/sigma,2)
-
-            #printf(zScore=zScore)
-
-            #percentageBetween = 1-2*sp.stats.norm.sf(abs(zScore)) # [%/100] percentage between -x...x
-            percentageBetween = 1-2*sp.stats.norm.sf(zScore) # [%/100] percentage between -x...x
-            reductionCoeff = 1-percentageBetween # coeff (0...1) to multiply the amplitude
-            #printf(percentageBetween=percentageBetween,reductionCoeff=reductionCoeff)
-
-            coeffLookupTable[zScore] = reductionCoeff
-    """
     
     for zScore in np.arange(0.00,3.01,0.01):
         percentageBetween = 1-2*sp.stats.norm.sf(zScore) # [%/100] percentage between -x...x
@@ -310,19 +245,6 @@ def calcDistances(coordinates):
 
     # ---------------------- New array of 16 electrodes arranged in pairs of 2 (as 2 rows of 8 electrodes). The orders below do not follow the physical format of the electrode pad
     if P_SIZE == 8: 
-        """
-        # Cross where 1,2 are going from left-to-mid + 8,7 going from right-to-mid + 3,4 front-to-mid + 6,5 back-to-mid. Center is center of cross
-        electrodeCoords = {
-            1: (-2*elecDist,0),
-            2: (-1*elecDist,0),
-            3: (0,2*elecDist),
-            4: (0,1*elecDist),
-            5: (0,-1*elecDist),
-            6: (0,-2*elecDist),
-            7: (1*elecDist,0),
-            8: (2*elecDist,0)
-        }
-        """
         # All in line like electrodes really are
         electrodeCoords = {
             1: (-4*elecDist,0),
