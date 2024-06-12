@@ -61,26 +61,6 @@ def initControllerValues():
     res = device.set_num_nplets(BM_NPLETAMOUNT)
     if not res: raise Exception("set_num_nplets error")
     
-    #res = device.set_num_nplets(1)
-    #if not res: raise Exception("set_num_nplets error")
-
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # -----------------------------------
-    # mode = "bipolar"
-    # voltage = 100
-    # currentRange = "high"
-
-    # nPletRate = 1
-    # timeBetweenPulses = 1
-
-    # commonPulseWidth = 500 # set to None if using unique pulse widths
-    # pulseWidths = [] # keep empty if using commonPulseWidth, otherwise fill each pulse (24) width separated by commas
-    
-    # commonPulseAmplitude = 200  # set to None if using pulseWidths
-    # pulseAmplitudes = [] # keep empty if using commonPulseAmplitude, otherwise fill each pulse (24) amplitude separated by commas
-
-    # anodesCathodes = [([3], [10])]
-    
     mode = BM_MODE
     voltage = BM_VOLTAGE
     currentRange = BM_CURRENTRANGE
@@ -211,8 +191,6 @@ def changeSettings(settings, debugging=False):
         if debugging: print("Set delay")
         if device.set_delay(settings.delay) is False: return False
 
-    #if settings.mode:
-        #if settings.mode == 'bipolar':
     if settings.channel_pairs:
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         print(settings.channel_pairs)
@@ -221,21 +199,7 @@ def changeSettings(settings, debugging=False):
         if device.set_pulses_bipolar(settings.channel_pairs) is False: return False
         print(device.channel_pairs)
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            #res = device.set_pulses_bipolar(settings.channel_pairs)
-            #if not res: 
-                #print(res)
-                #return False
-        #else: # mode == unipolar
-        #if settings.short_protocol:
-    #if settings.common_electrode_short:
-        #if debugging: print("SHORT: Set common anode/cathode (unipolar)")
-        #if device.set_common_electrode_short(settings.common_electrode_short) is False: return False
     
-    #if settings.output_channel_activity:
-        #if debugging: print("SHORT: Set output channel activity  (unipolar)")
-        #if device.set_output_channel_activity(settings.output_channel_activity) is False: return False
-            #pass
-        #else:
     if settings.common_electrode:
         if debugging: print("Set common anode/cathode (unipolar)")
         if device.set_common_electrode(settings.common_electrode) is False: return False
@@ -248,9 +212,6 @@ def changeSettings(settings, debugging=False):
 
 
 def executePulseSequence(data, prevTriggerTime):
-    # TODO selkeyden kannalta olisi parempi jos "changeSettings" funccia asetusten muutosteen, (toista funkkia käyttää triggaamiseen), 
-    # ja tätä vain data-dictin unpackaukseen ja delay odotus looppaukseen ym. Mutta tuoko lisää paljon delayta?
-
 
     # NOTE: When triggering an nplet, BiMatrix has takes settings from two places: "prebuffer" and "buffer". Upon triggering an nplet, the 
         # settings move from prebuffer to buffer, if any new settings were previously written to prebuffer. All settings for each individual pulse
@@ -352,45 +313,6 @@ def executePulseSequence(data, prevTriggerTime):
                 prevTimeBetweenPulses = timeBetweenPulses
                 combinedTimeBetweenPulses = 0
                 for i in range(pulseIndex+1,nPulses):
-                    """
-                    if data[order[i]]["relTiming"] <= 17:
-                        # All pulses with delay <= 15ms are set as a single nplet with minimum delay in betwen pulses (1ms)
-                        # TODO aseta joku flagi että löytyi jo tälläinen rykelmä ja breakkaa jos löytyy muita <= 50ms pulsesja jotka ei sovi tähän JA BREAK JOS FLÄGI JO ASETETTU
-                        pulsesInNplet+=1
-                        timeBetweenPulses = 1
-                    elif data[order[i]]["relTiming"] <= 34:
-                        # TODO aseta joku flagi että löytyi jo tälläinen rykelmä ja breakkaa jos löytyy muita <= 50ms pulsesja jotka ei oo tähän JA BREAK JOS FLÄGI JO ASETETTU
-                        pulsesInNplet+=1
-                        timeBetweenPulses = 25
-                    elif data[order[i]]["relTiming"] <= 51:
-                        # TODO aseta joku flagi että löytyi jo tälläinen rykelmä ja breakkaa jos löytyy muita <= 50ms pulsesja jotka ei oo tähän JA BREAK JOS FLÄGI JO ASETETTU
-                        pulsesInNplet+=1
-                        timeBetweenPulses = 42
-                    else:
-                        timeBetweenPulses = 1
-                        break
-                    """
-
-                    """
-                    # Group similar low-delay pulses to same nplet with delay handled within BiMatrix 
-                    if data[order[i]]["relTiming"] <= 20:
-                        groupTimeBetweenPulses = 1
-
-                        # break if 
-                        if pulsesInNplet > 1 and timeBetweenPulses != groupTimeBetweenPulses: break
-
-                        pulsesInNplet+=1
-                        timeBetweenPulses = groupTimeBetweenPulses
-                    elif data[order[i]]["relTiming"] <= 50:
-                        groupTimeBetweenPulses = 35
-                        if pulsesInNplet > 1 and timeBetweenPulses != groupTimeBetweenPulses: break
-
-                        pulsesInNplet+=1
-                        timeBetweenPulses = groupTimeBetweenPulses
-                    else:
-                        break
-                    """
-                    
                     # All following pulses with delay less than 40 (min. delay that BiMatrix is capable of is 47 in current system) are grouped to single nplet where all pulses are without delays
                     loopDelay = data[order[i]]["relTiming"]
                     printf(loopDelay=loopDelay)
@@ -436,9 +358,6 @@ def executePulseSequence(data, prevTriggerTime):
                 res = device.set_pulse_width(pulseWidths)
                 if not res: raise Exception("Error setting pulseWidths")
 
-            #print("ORIGINAL WRITTEN SETTINGS: ")
-            #printf(anodesCathodes=anodesCathodes, pulseWidths=pulseWidths)
-
             if pulsesInNplet != prevPulsesInNplet:
                 # The number of pulses and timebetweenpulses are taken from prebuffer (settings given above), but as other values are taken from buffer
                 # (values written before previous trigger), we need to rewrite settings with correct number of pulses in the nplet if the numbers differ
@@ -475,10 +394,6 @@ def executePulseSequence(data, prevTriggerTime):
                     printf("FAILED: TIME BETWEEN PULSES")
                     res = device.set_time_between(prevTimeBetweenPulses)
                     if not res: raise Exception("Error setting time between pulses")
-            
-            
-            #print("FINAL WRITTEN SETTINGS: ")
-            #printf(anodesCathodes=anodesCathodes, pulseWidths=pulseWidths, timeBetweenPulses=prevTimeBetweenPulses)
 
             pulseReady = True
 
@@ -489,15 +404,6 @@ def executePulseSequence(data, prevTriggerTime):
             elapsed_time_ms = elapsed_time*1000
             
             if elapsed_time_ms >= currPulseDelay:
-                #timeExceeded = round(elapsed_time_ms-currPulseDelay,0)
-                #print("Target delay was " + str(currPulseDelay) + "ms, waited " + str(round(elapsed_time_ms,0)) + "ms (" + str(timeExceeded) + "ms too long)")
-                
-                # if timeExceeded >= 5:
-                #     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                #     timeExceededCounter+=1
-                #     if timeExceededCounter >= 3:
-                #         raise Exception(fullPulseSequencesDone)
-
                 pulseIndex += pulsesInNplet
 
                 prev = now
