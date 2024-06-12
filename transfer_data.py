@@ -18,8 +18,6 @@ def poleCoordsToCartesian(polarCoordinates):
     # Azimuth (polar angle) should be in radians
     # NOTE: Azimuth 0 is forwards (up), not to right
 
-    # TODO pitää azimuth 0 kulman suoraa edessä vaiko ottaako normikäytännön toimintaan? (=0-kulma oikealle)
-
     len, azimuth = polarCoordinates
 
     # NOTE: not tested
@@ -46,6 +44,8 @@ def fetchRelCoordinates(fromFile=False):
                 #print(coordinates)
 
     else:
+        # use this to test certain ping coordinates directly without having to write them to the coordinates file
+        
         # coordinates = [
         #     (0,0),      # center
         #     (0,100),    # directly forward
